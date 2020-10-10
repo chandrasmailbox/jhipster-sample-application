@@ -11,14 +11,14 @@ node {
 
     stage('clean') {
         sh "chmod +x mvnw"
-        sh "./mvnw -ntp clean"
+        sh "./mvnw -ntp clean -P-webpack"
     }
     stage('nohttp') {
         sh "./mvnw -ntp checkstyle:check"
     }
 
     stage('install tools') {
-        sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v12.13.1 -DnpmVersion=6.13.4"
+        sh "./mvnw -ntp com.github.eirslett:frontend-maven-plugin:install-node-and-npm -DnodeVersion=v12.16.1 -DnpmVersion=6.14.5"
     }
 
     stage('npm install') {
@@ -27,7 +27,7 @@ node {
 
     stage('backend tests') {
         try {
-            sh "./mvnw -ntp verify"
+            sh "./mvnw -ntp verify -P-webpack"
         } catch(err) {
             throw err
         } finally {
@@ -46,7 +46,7 @@ node {
     }
 
     stage('packaging') {
-        sh "./mvnw -ntp verify -Pprod -DskipTests"
+        sh "./mvnw -ntp verify -P-webpack -Pprod -DskipTests"
         archiveArtifacts artifacts: '**/target/*.jar', fingerprint: true
     }
 }
